@@ -10,12 +10,17 @@
 
 			$group_banner_id = get_field('photo_group_image');
 			$group_banner = wp_get_attachment_image_src($group_banner_id, "banner-top");
-
 			$group_colour = get_field('photo_group_color');
 		}
 	}
 ?>
 
+<style>
+	#content a {
+		color: <?php echo $group_colour; ?>;
+		font-weight: bold;
+	}
+</style>
 <div id="main">
 	<div id="primary">
 		<div id="banner-image">

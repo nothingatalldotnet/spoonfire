@@ -3,8 +3,8 @@
 	update_option('siteurl','http://www.spoonfire.co.uk/');
 	update_option('home','http://www.spoonfire.co.uk/');
 
-//	update_option('siteurl','http://192.168.1.198/');
-//	update_option('home','http://192.168.1.198/');
+//	update_option('siteurl','http://192.168.1.201/');
+//	update_option('home','http://192.168.1.201/');
 
 	if (!isset($content_width)) {
 		$content_width = 640;
@@ -197,6 +197,16 @@
             'position'		=> '0.1',
             'redirect'		=> true
     	));
+    	acf_add_options_page(array(
+            'page_title' 	=> 'News Main Page',
+            'menu_title'	=> 'News Main Page',
+            'menu_slug' 	=> 'news',
+            'capability'	=> 'edit_posts',
+            'parent_slug'	=> 'edit.php?post_type=news',
+            'icon_url' 		=> 'dashicons-book',
+            'position'		=> '0.4',
+            'redirect'		=> true
+    	));
 	}
 
 	// post types
@@ -222,5 +232,24 @@
 				),
 			)
 		);
-
+		register_post_type('News',
+			array(
+				'labels' => array(
+					'name' => __('News'),
+					'singular_name' => _('News')
+				),
+				'show_in_nav_menus' => true,
+				'menu_position'=> 18,
+				'menu_icon'=>'dashicons-book',
+				'public' => true,
+				'has_archive' => true,
+				'query_var' => true,
+				'supports' => array('title','revisions'),
+				'rewrite' => array(
+					'slug'	=> 'news',
+					'pages' => true,
+					'with_front' => true
+				),
+			)
+		);
 	};

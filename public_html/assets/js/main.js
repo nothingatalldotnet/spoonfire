@@ -1,6 +1,11 @@
 // Crappy js, but it will do for now
 
 (function() {
+
+	$("body").on("contextmenu", "img", function(e) {
+		return false;
+	});
+
 	var container, button, menu,
 		iOS = navigator.userAgent.match(/(iPod|iPhone|iPad)/);
 

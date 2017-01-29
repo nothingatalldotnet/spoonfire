@@ -58,7 +58,7 @@
 ?>
 				<article class="photo">
 					<a class="fancybox" rel="group" href="<?php echo $this_big_image[0]; ?>">
-						<img class="lazy" src="/assets/images/ajax-loader.gif" data-original="<?php echo $this_image[0]; ?>">
+						<img class="lazy" src="/assets/images/watermark-grey.png" data-original="<?php echo $this_image[0]; ?>">
 					</a>
 <?php
 	if($can_i_buy) {

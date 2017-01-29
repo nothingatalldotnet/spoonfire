@@ -3,8 +3,8 @@
 	update_option('siteurl','http://www.spoonfire.co.uk/');
 	update_option('home','http://www.spoonfire.co.uk/');
 
-//	update_option('siteurl','http://192.168.1.201/');
-//	update_option('home','http://192.168.1.201/');
+//	update_option('siteurl','http://192.168.1.198/');
+//	update_option('home','http://192.168.1.198/');
 
 	if (!isset($content_width)) {
 		$content_width = 640;
@@ -140,11 +140,13 @@
 
 	function spoonfire_scripts() {
 		wp_enqueue_style('spoonfire-style', get_stylesheet_uri() );
-		wp_enqueue_script('spoonfire-main', '/assets/js/main.js', array(), '20150505', true );
 		wp_enqueue_script('spoonfire-modernizr', '/assets/js/modernizr.js', array(), '20150505', true );
 		wp_enqueue_script('spoonfire-classie', '/assets/js/classie.js', array(), '20150505', true );
+		wp_enqueue_script('spoonfire-fancybox', '/assets/js/jquery.fancybox.js', array(), '20150505', true );
 		wp_enqueue_script('spoonfire-menu', '/assets/js/menu.js', array( 'jquery' ), '20150505', true );
 		wp_enqueue_script('spoonfire-skip-link-focus-fix', '/assets/js/skip-link-focus-fix.js', array(), '20130115', true );
+		wp_enqueue_script('spoonfire-lazy', '/assets/js/jquery.lazyload.min.js', array(), '20150505', true );
+		wp_enqueue_script('spoonfire-main', '/assets/js/main.js', array(), '20150505', true );
 
 		if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 			wp_enqueue_script( 'comment-reply' );
@@ -166,6 +168,10 @@
 	add_theme_support('post-thumbnails');
 	add_image_size('gallery-thumbnail', 400, 400, true);
 	add_image_size('banner-top', 2000, 80, true);
+	add_image_size('fancybox', 700, 9999, false);
+
+$role_object = get_role( 'shop_manager' );
+$role_object->add_cap( 'edit_theme_options' );
 
 	// options
     if(function_exists('acf_add_options_page')) {
@@ -175,7 +181,7 @@
 	            'menu_slug' 	=> 'home',
 	            'capability'	=> 'edit_posts',
 	            'icon_url' 		=> 'dashicons-admin-home',
-	            'position' 		=> '1.2',
+	            'position' 		=> '1.4',
 	            'redirect'		=> false
 	    ));
 	    acf_add_options_page(array(
@@ -184,7 +190,16 @@
 	            'menu_slug' 	=> 'social',
 	            'capability'	=> 'edit_posts',
 	            'icon_url' 		=> 'dashicons-share',
-	            'position' 		=> '1.3',
+	            'position' 		=> '1.5',
+	            'redirect'		=> false
+	    ));
+	    acf_add_options_page(array(
+	            'page_title' 	=> 'Menu Style',
+	            'menu_title'	=> 'Menu Style',
+	            'menu_slug' 	=> 'menu',
+	            'capability'	=> 'edit_posts',
+	            'icon_url' 		=> 'dashicons-admin-appearance',
+	            'position' 		=> '1.6',
 	            'redirect'		=> false
 	    ));
     	acf_add_options_page(array(

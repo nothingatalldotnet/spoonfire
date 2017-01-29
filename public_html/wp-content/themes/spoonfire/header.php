@@ -9,6 +9,36 @@
 		<?php wp_head(); ?>
 		<link href="https://fonts.googleapis.com/css?family=Oswald:300,400" rel="stylesheet">
         <link rel="shortcut icon" type="image/png" href="/favicon.png" /> 
+        <link rel="stylesheet" href="/assets/css/jquery.fancybox.css" type="text/css"/>
+<?php
+	function hex2rgb($hex) {
+		$hex = str_replace("#", "", $hex);
+
+		if(strlen($hex) == 3) {
+			$r = hexdec(substr($hex,0,1).substr($hex,0,1));
+			$g = hexdec(substr($hex,1,1).substr($hex,1,1));
+			$b = hexdec(substr($hex,2,1).substr($hex,2,1));
+		} else {
+			$r = hexdec(substr($hex,0,2));
+			$g = hexdec(substr($hex,2,2));
+			$b = hexdec(substr($hex,4,2));
+		}
+		$rgb = array($r, $g, $b);
+		return $rgb;
+	}
+
+	if(get_field('menu_background_colour','option')) {
+		$menu_hex = get_field('menu_background_colour','option');
+	} else {
+		$menu_hex = "#0085a1";
+	}
+	$menu_rgba = hex2rgb($menu_hex);
+?>
+<style>
+.overlay {
+	background: rgba(<?php echo $menu_rgba[0].",".$menu_rgba[1].",".$menu_rgba[2]; ?>, .9);
+}
+</style>
 	</head>
 	<body <?php body_class(); ?>>
 		<div class="container">
@@ -21,18 +51,18 @@
 						<div class="social centre">
 <?php
 	if(get_field('social_facebook','option')) {
-		echo "<a class=\"social-icon social-facebook\" target=\"_blank\" href=\"".get_field('social_facebook','option')."\"><img src=\"".get_template_directory_uri()."/images/social_facebook.png\" alt=\"Facebook\"></a>\n";
+		echo "<a class=\"social-icon social-facebook\" target=\"_blank\" href=\"".get_field('social_facebook','option')."\"><img src=\"/assets/images/social_facebook.png\" alt=\"Facebook\"></a>\n";
 	}
 	if(get_field('social_twitter','option')) {
-		echo "<a class=\"social-icon social-twitter\" target=\"_blank\" href=\"".get_field('social_twitter','option')."\"><img src=\"".get_template_directory_uri()."/images/social_twitter.png\" alt=\"Twitter\"></a>\n";
+		echo "<a class=\"social-icon social-twitter\" target=\"_blank\" href=\"".get_field('social_twitter','option')."\"><img src=\"/assets/images/social_twitter.png\" alt=\"Twitter\"></a>\n";
 	}
 	if(get_field('social_instagram','option')) {
-		echo "<a class=\"social-icon social-instagram\" target=\"_blank\" href=\"".get_field('social_instagram','option')."\"><img src=\"".get_template_directory_uri()."/images/social_instagram.png\" alt=\"Instagram\"></a>\n";
+		echo "<a class=\"social-icon social-instagram\" target=\"_blank\" href=\"".get_field('social_instagram','option')."\"><img src=\"/assets/images/social_instagram.png\" alt=\"Instagram\"></a>\n";
 	}
 ?>
 						</div>
 						<div class="menu-button right">
-							<a id="trigger-overlay" href="javascript:void(0)"><img src="<?php echo get_template_directory_uri(); ?>/images/icon-toggle-menu.png" alt="menu"></a>
+							<a id="trigger-overlay" href="javascript:void(0)"><img src="/assets/images/icon-toggle-menu.png" alt="menu"></a>
 						</div>
 					</div>
 				</nav>

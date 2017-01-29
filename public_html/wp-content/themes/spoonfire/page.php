@@ -1,6 +1,5 @@
 <?php
 	get_header();
-
 	if(get_the_ID() == 39) {
 		// checkout
 		$banner_image_id = get_field('checkout_main_banner_image');

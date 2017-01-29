@@ -391,7 +391,7 @@ input[type="submit"].search-submit {
 	height: 38px;
 	border-radius: 20px;
 	right: 1px;
-	background: #ffffff url(images/icon-search.png) no-repeat center center;
+	background: #ffffff url(/assets/images/icon-search.png) no-repeat center center;
 }
 
 
@@ -531,7 +531,7 @@ input[type="submit"].search-submit {
 	height: 38px;
 	border-radius: 20px;
   	right: 1px;
-	background: #ffffff url(images/icon-search.png) no-repeat center center;
+	background: #ffffff url(/assets/images/icon-search.png) no-repeat center center;
 }
 
 .overlay {
@@ -540,7 +540,7 @@ input[type="submit"].search-submit {
 	height: 100%;
 	top: 0;
 	left: 0;
-	background: rgba(0, 133, 161, .9);
+/*	background: rgba(0, 133, 161, .9); */
 	overflow-y: scroll;
 }
 
@@ -585,7 +585,7 @@ input[type="submit"].search-submit {
 	top: 20px;
 	overflow: hidden;
 	border: none;
-	background: url(images/icon-cross.png) no-repeat center center;
+	background: url(/assets/images/icon-cross.png) no-repeat center center;
 	text-indent: 200%;
 	color: transparent;
 	outline: none;
@@ -891,7 +891,7 @@ input[type="submit"].search-submit {
 	height: 38px;
 	border-radius: 20px;
 	right: 1px;
-	background: #ffffff url(images/icon-search.png) no-repeat center center;
+	background: #ffffff url(/assets/images/icon-search.png) no-repeat center center;
 }
 
 
@@ -975,8 +975,8 @@ input[type="submit"].search-submit {
 .photo {
 	display: inline-block;
 	width: calc(25% - 6px);
+	height: calc(25% - 6px);
 	margin-right: 8px;
-	padding-bottom: 35px;
 }
 
 .photo:nth-of-type(4n) {
@@ -988,6 +988,11 @@ input[type="submit"].search-submit {
 	height: auto;
 }
 
+.photo form {
+	position: relative;
+    margin-top: -72px;
+    height: 50px;
+}
 
 a.edd_download_file_link {
 	font-family: 'Oswald', sans-serif;
@@ -995,6 +1000,10 @@ a.edd_download_file_link {
 	text-decoration: none;
 	color: #ff0000;
 	background-image: none;
+}
+
+.edd-cart-ajax-alert {
+	display: none;
 }
 
 .wpcf7-form p label {
@@ -1025,6 +1034,10 @@ a.edd_download_file_link {
 
 .edd-cp-container {
 	margin: 0 0 4px 0;
+	float: left;
+}
+.edd_purchase_submit_wrapper {
+	float: right;
 }
 
 .edd_cp_price {
@@ -1034,23 +1047,54 @@ a.edd_download_file_link {
     position: relative;
 }
 
-@media (max-width: 600px) {
+.fancybox-close {
+	background-position : 0 0;
+}
 
+@media (max-width: 1100px) and (min-width: 841px) {
+	.photo {
+		display: inline-block;
+		width: calc(33% - 4px);
+		margin-right: 4px;
+	}
+
+	.photo:nth-of-type(3n) {
+		margin-right: 0;
+	}
+	.photo:nth-of-type(4n) {
+		margin-right: 4px;
+	}
+}
+
+@media (max-width: 840px) {
 	#menu-top-menu {
 		width: 300px;
 		margin: 0;
 	}
-
 	.overlay ul li {
 		min-height: 0;
 	}
+}
+
+@media (max-width: 840px) and (min-width: 501px) {
+
 
 	.photo {
 		display: inline-block;
 		width: calc(50% - 4px);
 		margin-right: 8px;
-		min-width: 375px;
+		margin-bottom: 4px;
 	}
+
+	.photo form {
+		height: 44px;
+		margin-top: -66px;
+	}
+
+	.edd_download_purchase_form {
+		padding: 17px 8px 0px 8px;
+	}
+
 	.photo:nth-of-type(2n) {
 		margin-right: 0;
 	}
@@ -1067,6 +1111,20 @@ a.edd_download_file_link {
 		font-size: 10px !important;
 	}
 }
+
+@media (max-width: 500px) {
+	.photo {
+		display: inline-block;
+		width: calc(100% - 4px);
+		margin-right: 0;
+		margin-bottom: 4px;
+	}
+
+	.edd_download_purchase_form {
+		padding: 17px 8px 0px 8px;
+	}
+}
+
 .browse-all {
 	text-align: center;
 	padding: 50px 0;

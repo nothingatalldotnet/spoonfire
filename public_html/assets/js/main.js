@@ -6,6 +6,14 @@
 		return false;
 	});
 
+	$(".fancybox").fancybox();
+
+
+	$("img.lazy").lazyload({
+		effect : "fadeIn"
+	});
+
+
 	var container, button, menu,
 		iOS = navigator.userAgent.match(/(iPod|iPhone|iPad)/);
 

@@ -14,11 +14,16 @@
 	}
 	$banner_image = wp_get_attachment_image_src($banner_image_id, 'banner-top');
 ?>
+<style>
+	#banner-image {
+		background-image: url(<?php echo $banner_image[0]; ?>);
+		background-repeat: no-repeat;
+		background-size: cover;
+	}
+</style>
 <div id="main">
 	<div id="primary">
-		<div id="banner-image">
-			<img src="<?php echo $banner_image[0]; ?>">
-		</div>
+		<div id="banner-image"></div>
 		<div id="content" class="wrap">
 <?php
 	while (have_posts()) {

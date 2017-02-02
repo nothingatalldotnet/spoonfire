@@ -5,7 +5,7 @@
 		<meta http-equiv="x-ua-compatible" content="IE=edge" >
 		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=no">
 		<meta name="google-site-verification" content="m-gjo2EHS4nDaOwmLlj1OE4NWb1Au5ZGRNMLrGKo7vw" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
 		<?php wp_head(); ?>
 		<link href="https://fonts.googleapis.com/css?family=Oswald:300,400" rel="stylesheet">
         <link rel="shortcut icon" type="image/png" href="/favicon.png" /> 

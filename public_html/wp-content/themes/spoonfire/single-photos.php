@@ -27,12 +27,15 @@
 		background: rgba(<?php echo $hex_group_colour[0].",".$hex_group_colour[1].",".$hex_group_colour[2]; ?>,0.5);
 	}
 
+	#banner-image {
+		background-image: url(<?php echo $group_banner[0]; ?>);
+		background-repeat: no-repeat;
+		background-size: cover;
+	}
 </style>
 <div id="main">
 	<div id="primary">
-		<div id="banner-image">
-			<img src="<?php echo $group_banner[0]; ?>">
-		</div>
+		<div id="banner-image"></div>
 		<div id="content" class="wrap">
 			<div class="entry-header">
 				<h1 class="entry-title"><?php echo $group_title; ?></h1>

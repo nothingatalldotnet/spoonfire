@@ -139,7 +139,7 @@
 	add_theme_support( 'title-tag' );
 
 	function spoonfire_scripts() {
-		wp_enqueue_style('spoonfire-style', get_stylesheet_uri() );
+		wp_enqueue_style('spoonfire-style', '/assets/css/style.min.css');
 		wp_enqueue_script('spoonfire-modernizr', '/assets/js/modernizr.js', array(), '20150505', true );
 		wp_enqueue_script('spoonfire-classie', '/assets/js/classie.js', array(), '20150505', true );
 		wp_enqueue_script('spoonfire-fancybox', '/assets/js/jquery.fancybox.js', array(), '20150505', true );

@@ -4,9 +4,10 @@ Donate link: https://yoast.com/
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: SEO, XML sitemap, Google Search Console, Content analysis, Readability
-Requires at least: 4.4
-Tested up to: 4.7
-Stable tag: 4.1
+Requires at least: 4.6
+Tested up to: 4.8.2
+Stable tag: 5.6.1
+Requires PHP: 5.2.4
 
 Improve your WordPress SEO: Write better content and have a fully optimized WordPress site using the Yoast SEO plugin.
 
@@ -124,53 +125,138 @@ You'll find answers to many of your questions on [kb.yoast.com](https://kb.yoast
 
 == Changelog ==
 
-= 4.1.0 =
+= 5.6.1 =
 
-Release Date: January 17th, 2017
+Release Date: October 13th, 2017
 
-* Bugfixes:
-	* Fixes a glitch in the notification center where a notification would be shown twice.
-	* Fixes a bug where the realtime analysis didn't work on term pages.
-	* Fixes a bug where the sitemap invalidation uses an expensive query to clean up old validators.
+Bugfixes
+	* Fixes a bug where the SEO Manager role was not being able to save SEO settings.
 
-* Enhancements:
-	* Added a mobile snippet preview.
-	* Added a function that allows retrieving an option only when it's been autoloaded.
-	* Remove review banner from mobile, props [abhinavkumar940](https://github.com/abhinavkumar940).
-	* Add labels to redirect checkboxes in the search console to improve accessibility.
+= 5.6.0 =
 
-= 4.0.2 =
+Release Date: October 10th, 2017
 
-Release Date: December 20th, 2016
+Enhancements
+	* Removes legacy license page and shows the new license page by default.
+	* Changes references from licenses to subscriptions and sites on the premium submenu page.
+	* Changes the appearance of the Help Center in line with our design approach.
+	* Introduces an explanation bar when the `Cornerstone content` filter is active.
+
+Bugfixes
+	* Fixes a bug where Hebrew slugs aren't decoded on display in the bulk editor.
+	* Fixes a bug where the internal link count is not updated when there are no links to that page or post anymore.
+	* Fixes the `Cornerstone content` filter to behave consistently with existing WordPress filters.
+
+= 5.5.1 =
+
+Release Date: September 28th, 2017
 
 * Bugfixes
-	* Fixes a bug where shortcodes would be kept in the content that would be analyzed, which would result in incorrect results.
-	* Fixes a bug where the user language would be used to analyze the content instead of the site language.
+	* Fixes Snippet preview error when Yoast metabox has been removed.
 
-= 4.0.0 =
+* Changes
+	* Change Yoast Blog feed to new endpoint.
 
-Release Date: December 13th, 2016
+= 5.5.0 =
 
-* Enhancements:
-	* License manager: Add a get_extension_url method to Yoast_Product to retrieve the URL where people can extend/upgrade their license.
-	* License manager: Add a set_extension_url method to Yoast_Product to set the URL where people can extend/upgrade their license.
-	* Updates the credits page.
-	* Improves plugin naming in translations.
-	* Improves translations by making texts more consistent.
-	* Displays the translations in the language chosen by the user in stead of using only the site language.
-	* Improves the styling of the banners.
-	* Adds passive voice for German.
-	* Adds more transition words for French.
-	* Improves feedback strings for the meta description length assessment.
-	* Improves matching of the keyword in the first paragraph.
-	* Improves the snippet preview to match the styling of googles snippet.
+Release Date: September 26th, 2017
 
-* Bugfixes:
-	* Fixes a compatibility bug with the onboarding wizard and Polylang, and possibly more plugins that prevented the configuration wizard from working properly.
-	* Fixes a bug where post format archives showed up in sitemap when disabled.
-	* Fixes a bug where an old update notice would not be removed.
-	* Fixes a bug where keywords with periods where not highlighted in the snippet.
-	* Fixes a bug where the title of the metabox wasn't displayed correctly.
+* Enhancements
+	* Updated the Dashboard Widget with a new design.
+	* Added additional explanations to the Configuration wizard.
+	* Added `contentinfo` landmark for assistive technologies to the Configuration wizard page.
+	* Introduces `wpseo_manager` and `wpseo_editor` roles.
+	* Introduces `wpseo_manage_options` capability to control which users have access to all SEO settings.
+	* Introduces `wpseo_edit_advanced_metadata` capability to control which users have access to the advanced SEO settings.
+
+* Bugfixes
+	* Fixed a bug where certain options (`site_type`, `environment_type` and `has_multiple_authors`) would be reset to their default value whenever one of the feature toggles were changed.
+	* Ensured that `has_multiple_authors` gets validated.
+
+= 5.4.2
+
+Release Date: September 21st, 2017
+
+* Bugfixes
+	* Replace unsupported query `prepare` placeholder `%1$d` with `%d` to fix broken queries. Fixes compatibility issue with WordPress 4.8.2.
+
+= 5.4.1
+
+Release Date: September 20th, 2017
+
+* Bugfixes
+	* Replace unsupported query `prepare` placeholder `%1$s` with `%d` to fix broken queries. Fixes compatibility issue with WordPress 4.8.2.
+
+= 5.4.0 =
+
+Release Date: September 6th, 2017
+
+* Enhancements
+	* Added a hook to disabled the twitter card. (Props: @petenelson)
+
+* Performance
+	* Replaced the use of `get_posts` and `get_children` by `WP_Query`.
+
+* Bugfixes
+	* Archive pages are excluded from the sitemap based on the noindex setting. (Props: @stodorovic)
+	* Prevent the throwing of an error when `wpseoPostScraperL10n` is not defined.
+	* Escapes all input when generating links for the RSS feed.
+	* Apply the `wp_get_attachment_url` filter to Sitemap images.
+
+= 5.3.3 =
+
+Release Date: August 28th, 2017
+
+* Bugfixes
+	* Fixes a bug where table listings were not giving expected content, props [Kyle B. Johnson](https://github.com/kjohnson).
+
+= 5.3.2 =
+
+Release Date: August 23rd, 2017
+
+* Bugfixes
+	* Fixes a bug where an invalid license notification could be shown in certain situations.
+
+= 5.3.1 =
+
+Release Date: August 22nd, 2017
+
+* Bugfixes
+	* Fixes a bug where "mark as fixed" on the search console page didn't work.
+	* Fixes a bug where the configuration wizard JavaScript file was too large.
+
+= 5.3.0 =
+
+Release Date: August 22nd, 2017
+
+* Enhancements
+	* Adds missing I18n function call to make a string translatable
+	* Adds XML schema for image sitemap, props: [stodorovic](https://github.com/stodorovic)
+	* Adds schema.org meta-data on every page, instead of only on the homepage
+	* Adds the possibility to filter posts by readability score.
+	* Exposes tinyMCEHelper as window.YoastSEO.wp._tinyMCEHelper in JavaScript
+	* Exposes the ReplaceVar class in YoastReplaceVarPlugin as window.YoastReplaceVarPlugin.ReplaceVar in JavaScript
+
+* Bugfixes
+	* Adds sanitization for the Twitter Image meta field
+	* Fixes use of `register_meta` for usage in WordPress 4.6 and higher
+	* Initialize the providers on hook `after_theme_setup` to make sure custom providers are added properly, props: [stodorovic](https://github.com/stodorovic)
+	* Changes the label of the "Bad" score to "Needs improvement" while filtering on SEO or readability scores.
+
+= 5.2.0 =
+
+Release Date: August 8th, 2017
+
+* Enhancements
+	* Added wpseo_pre_adjacent_rel_links filter to bypass built-in rel prev/next functionality.
+	* Introduces classes to allow collecting data in the Premium plugin.
+	* Renamed OnPage.org to Ryte.
+	* Allow WordPress WHIP messages to be dismissed for a period of 4 weeks.
+	* Adds a filter for word combinations that consist of a single one-character word.
+	* Adds aria-current to the onboarding wizard active step.
+
+* Bugfixes
+	* Removes JQMIGRATE JavaScript warnings.
 
 = Earlier versions =
 

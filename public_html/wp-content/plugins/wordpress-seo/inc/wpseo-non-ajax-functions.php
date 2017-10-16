@@ -26,12 +26,6 @@ function wpseo_admin_bar_menu() {
 
 	global $wp_admin_bar, $post;
 
-	// Determine is user is admin or network admin.
-	$user_is_admin_or_networkadmin = current_user_can( 'manage_options' );
-	if ( ! $user_is_admin_or_networkadmin && is_multisite() ) {
-		$user_is_admin_or_networkadmin = ( $options['access'] === 'superadmin' && is_super_admin() );
-	}
-
 	$focuskw = '';
 	$score   = '';
 	// By default, the top level menu item has no link.
@@ -66,8 +60,11 @@ function wpseo_admin_bar_menu() {
 	// Never display notifications for network admin.
 	$counter = $alert_popup = '';
 
+	// Determine is user is admin or network admin.
+	$can_manage_seo = WPSEO_Capability_Utils::current_user_can( 'wpseo_manage_options' );
+
 	// Set the top level menu item content for admins and network admins.
-	if ( $user_is_admin_or_networkadmin ) {
+	if ( $can_manage_seo ) {
 
 		// Link the top level menu item to the Yoast Dashboard page.
 		$seo_url = get_admin_url( null, 'admin.php?page=' . WPSEO_Admin::PAGE_IDENTIFIER );
@@ -90,11 +87,19 @@ function wpseo_admin_bar_menu() {
 			}
 
 			if ( $new_notifications_count ) {
-				$notification = sprintf(
-					/* translators: %d resolves to the number of alerts being added. */
-					_n( 'You have a new issue concerning your SEO!', 'You have %d new issues concerning your SEO!', $new_notifications_count, 'wordpress-seo' ),
-					$new_notifications_count
-				);
+				if ( $new_notifications_count === 1 ) {
+					$notification = sprintf(
+						__( 'You have a new issue concerning your SEO!', 'wordpress-seo' ),
+						$new_notifications_count
+					);
+				}
+				else {
+					$notification = sprintf(
+						/* translators: %d resolves to the number of alerts being added. */
+						_n( 'You have %d new issue concerning your SEO!', 'You have %d new issues concerning your SEO!', $new_notifications_count, 'wordpress-seo' ),
+						$new_notifications_count
+					);
+				}
 				$alert_popup = '<div class="yoast-issue-added">' . $notification . '</div>';
 			}
 		}
@@ -244,7 +249,7 @@ function wpseo_admin_bar_menu() {
 	}
 
 	// @todo: add links to bulk title and bulk description edit pages.
-	if ( $user_is_admin_or_networkadmin ) {
+	if ( $can_manage_seo ) {
 
 		$advanced_settings = wpseo_advanced_settings_enabled( $options );
 
@@ -301,7 +306,7 @@ function wpseo_admin_bar_menu() {
 		$wp_admin_bar->add_menu( array(
 			'parent' => 'wpseo-settings',
 			'id'     => 'wpseo-licenses',
-			'title'  => __( 'Go Premium', 'wordpress-seo' ),
+			'title'  => __( 'Premium', 'wordpress-seo' ),
 			'href'   => admin_url( 'admin.php?page=wpseo_licenses' ),
 		) );
 	}
@@ -370,7 +375,7 @@ function wpseo_tax_adminbar_content_score() {
 function wpseo_adminbar_score( $score ) {
 	$score = WPSEO_Utils::translate_score( $score );
 
-	$score_adminbar_element = '<div class="wpseo-score-icon adminbar-seo-score '. $score .'"><span class="adminbar-seo-score-text screen-reader-text"></span></div>';
+	$score_adminbar_element = '<div class="wpseo-score-icon adminbar-seo-score ' . $score . '"><span class="adminbar-seo-score-text screen-reader-text"></span></div>';
 	return $score_adminbar_element;
 }
 

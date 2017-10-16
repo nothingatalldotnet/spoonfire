@@ -9,9 +9,7 @@
 	$(".fancybox").fancybox();
 
 
-	$("img.lazy").lazyload({
-		effect : "fadeIn"
-	});
+	$("img.lazy").lazyload();
 
 
 	var container, button, menu,

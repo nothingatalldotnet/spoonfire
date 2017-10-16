@@ -220,7 +220,7 @@ class WPSEO_Options {
 	 * Get an option only if it's been auto-loaded.
 	 *
 	 * @static
-	 * 
+	 *
 	 * @param string     $option  The option to retrieve.
 	 * @param bool|mixed $default A default value to return.
 	 *
@@ -351,7 +351,7 @@ class WPSEO_Options {
 				self::reset_ms_blog( get_current_blog_id() );
 				self::initialize();
 			}
-			else if ( $force_init === true ) {
+			elseif ( $force_init === true ) {
 				self::initialize();
 			}
 		}
@@ -421,6 +421,7 @@ class WPSEO_Options {
 
 	/********************** DEPRECATED FUNCTIONS **********************/
 
+	// @codeCoverageIgnoreStart
 	/**
 	 * Check whether the current user is allowed to access the configuration.
 	 *
@@ -473,4 +474,5 @@ class WPSEO_Options {
 		_deprecated_function( __METHOD__, 'WPSEO 1.5.6.1', 'WPSEO_Utils::clear_rewrites()' );
 		WPSEO_Utils::clear_rewrites();
 	}
+	// @codeCoverageIgnoreEnd
 }

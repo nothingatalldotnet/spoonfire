@@ -11,11 +11,11 @@ IndexIgnore *
 <IfModule mod_rewrite.c>
         RewriteEngine On
 
-        RewriteCond %{HTTP_HOST} ^spoonfire.co.uk [NC]
-        RewriteRule ^(.*)$ https://www.spoonfire.co.uk/$1 [L,R=301,NC]
+#        RewriteCond %{HTTP_HOST} ^spoonfire.co.uk [NC]
+#        RewriteRule ^(.*)$ https://www.spoonfire.co.uk/$1 [L,R=301,NC]
 
-        RewriteCond %{HTTPS} off
-        RewriteRule (.*) https://%{SERVER_NAME}/$1 [R,L]
+#        RewriteCond %{HTTPS} off
+#        RewriteRule (.*) https://%{SERVER_NAME}/$1 [R,L]
 
         # Wordpress login
         RewriteRule ^spoonfire-login/?$ /wp-login.php?nou777SDDA3sdfs [R,L]
@@ -47,11 +47,10 @@ IndexIgnore *
         Header always set X-Frame-Options "SAMEORIGIN"
         Header always set X-Content-Type-Options "nosniff"
         Header always edit Set-Cookie (.*) "$1;HttpOnly;Secure"
-        Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
-        Header always unset Content-Security-Policy
-		Header always set Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline' https://ajax.googleapis.com https://fonts.googleapis.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://www.google-analytics.com; frame-src 'self'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com"
-		Header always set X-Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline' https://ajax.googleapis.com https://fonts.googleapis.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://www.google-analytics.com; frame-src 'self'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com"
-		Header always set X-WebKit-CSP: "default-src 'self'; script-src 'self' 'unsafe-inline' https://ajax.googleapis.com https://fonts.googleapis.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://www.google-analytics.com; frame-src 'self'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com"
+    	Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+#		Header always set Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline' https://ajax.googleapis.com https://fonts.googleapis.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://www.google-analytics.com; frame-src 'self'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com"
+#		Header always set X-Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline' https://ajax.googleapis.com https://fonts.googleapis.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://www.google-analytics.com; frame-src 'self'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com"
+#		Header always set X-WebKit-CSP: "default-src 'self'; script-src 'self' 'unsafe-inline' https://ajax.googleapis.com https://fonts.googleapis.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https://www.google-analytics.com; frame-src 'self'; font-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com"
        Header set C "nothingatall.net 2017"
 </IfModule>
 

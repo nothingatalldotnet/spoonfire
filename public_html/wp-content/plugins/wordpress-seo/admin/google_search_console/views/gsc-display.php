@@ -3,8 +3,8 @@
  * @package WPSEO\Admin|Google_Search_Console
  */
 
-	// Admin header.
-	Yoast_Form::get_instance()->admin_header( false, 'wpseo-gsc', false, 'yoast_wpseo_gsc_options' );
+// Admin header.
+Yoast_Form::get_instance()->admin_header( false, 'wpseo-gsc', false, 'yoast_wpseo_gsc_options' );
 
 if ( defined( 'WP_DEBUG' ) && WP_DEBUG && WPSEO_GSC_Settings::get_profile() !== '' ) { ?>
 	<form action="" method="post" class="wpseo-gsc-reload-crawl-issues-form">
@@ -22,15 +22,16 @@ if ( defined( 'WP_DEBUG' ) && WP_DEBUG && WPSEO_GSC_Settings::get_profile() !== 
 
 // Video explains about the options when connected only.
 if ( null !== $this->service->get_client()->getAccessToken() ) {
-	$video_url = 'https://yoa.st/screencast-search-console';
+	$video_url = WPSEO_Shortlinker::get( 'https://yoa.st/screencast-search-console' );
 }
 else {
-	$video_url = 'https://yoa.st/screencast-connect-search-console';
+	$video_url = WPSEO_Shortlinker::get( 'https://yoa.st/screencast-connect-search-console' );
 }
 
-$tab = new WPSEO_Option_Tab( 'GSC', __( 'Google Search Console' ), array( 'video_url' => $video_url ) );
-$GSCHelpCenter = new WPSEO_Help_Center( 'google-search-console', $tab );
-$GSCHelpCenter->output_help_center();
+$tab = new WPSEO_Option_Tab( 'GSC', __( 'Google Search Console', 'wordpress-seo' ), array( 'video_url' => $video_url ) );
+$gsc_help_center = new WPSEO_Help_Center( 'google-search-console', $tab );
+$gsc_help_center->localize_data();
+$gsc_help_center->mount();
 
 switch ( $platform_tabs->current_tab() ) {
 	case 'settings' :
@@ -117,6 +118,17 @@ switch ( $platform_tabs->current_tab() ) {
 		break;
 }
 ?>
+<?php
+	// Add link to Knowledge Base article about crawl issues.
+	echo '<p>';
+
+	printf(
+	/* translators: %1$s expands anchor to knowledge base article, %2$s expands to </a> */
+	__( 'Please refer to %1$sour article about how to connect your website to Google Search Console%2$s if you need assistance.', 'wordpress-seo' ), '<a href="https://kb.yoast.com/kb/how-to-connect-and-retrieve-crawl-issues/" target="_blank">', '</a>' );
+
+	echo '</p>';
+?>
+
 	<br class="clear" />
 <?php
 

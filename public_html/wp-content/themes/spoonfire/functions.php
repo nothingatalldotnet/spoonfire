@@ -1,10 +1,10 @@
 <?php
 
-	update_option('siteurl','http://www.spoonfire.co.uk/');
-	update_option('home','http://www.spoonfire.co.uk/');
+//	update_option('siteurl','http://www.spoonfire.co.uk/');
+//	update_option('home','http://www.spoonfire.co.uk/');
 
-//	update_option('siteurl','http://192.168.1.198/');
-//	update_option('home','http://192.168.1.198/');
+	update_option('siteurl','http://localhost/');
+	update_option('home','http://localhost/');
 
 	if (!isset($content_width)) {
 		$content_width = 640;

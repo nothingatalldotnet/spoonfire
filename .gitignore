@@ -1,4 +1,14 @@
-*.log
 wp-config.php
 /sitemap.xml
 /sitemap.xml.gz
+public_html/wp-content/uploads
+public_html/.htaccess
+public_html/.htpasswd
+*.sql
+*.pem
+*.ppk
+*.log
+.DS_Store
+license.txt
+readme.html
+wp-config-sample.php

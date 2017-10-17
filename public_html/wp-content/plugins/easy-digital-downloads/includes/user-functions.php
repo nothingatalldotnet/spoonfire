@@ -126,15 +126,21 @@ function edd_get_users_purchased_products( $user = 0, $status = 'complete' ) {
 	}
 
 	// Get all the items purchased
+	$limit_payments = apply_filters( 'edd_users_purchased_products_payments', 9999 );
 	$payment_ids    = array_reverse( explode( ',', $customer->payment_ids ) );
-	$limit_payments = apply_filters( 'edd_users_purchased_products_payments', 50 );
-	if ( ! empty( $limit_payments ) ) {
-		$payment_ids = array_slice( $payment_ids, 0, $limit_payments );
-	}
+	$payment_args   = array(
+		'output'   => 'payments',
+		'post__in' => $payment_ids,
+		'status'   => $status,
+		'number'   => $limit_payments,
+	);
+	$payments_query = new EDD_Payments_Query( $payment_args );
+	$payments       = $payments_query->get_payments();
+
 	$purchase_data  = array();
 
-	foreach ( $payment_ids as $payment_id ) {
-		$purchase_data[] = edd_get_payment_meta_downloads( $payment_id );
+	foreach ( $payments as $payment ) {
+		$purchase_data[] = $payment->downloads;
 	}
 
 	if ( empty( $purchase_data ) ) {
@@ -204,6 +210,13 @@ function edd_has_user_purchased( $user_id, $downloads, $variable_price_id = null
 		return false;
 	}
 
+	/**
+	 * @since 2.7.7
+	 *
+	 * Allow 3rd parties to take actions before the history is queried.
+	 */
+	do_action( 'edd_has_user_purchased_before', $user_id, $downloads, $variable_price_id );
+
 	$users_purchases = edd_get_users_purchases( $user_id );
 
 	$return = false;
@@ -223,18 +236,27 @@ function edd_has_user_purchased( $user_id, $downloads, $variable_price_id = null
 						$variable_prices = edd_has_variable_prices( $download['id'] );
 						if ( $variable_prices && ! is_null( $variable_price_id ) && $variable_price_id !== false ) {
 							if ( isset( $download['item_number']['options']['price_id'] ) && $variable_price_id == $download['item_number']['options']['price_id'] ) {
-								return true;
+								$return = true;
+								break 2; // Get out to prevent this value being overwritten if the customer has purchased item twice
 							} else {
 								$return = false;
 							}
 						} else {
 							$return = true;
+							break 2;  // Get out to prevent this value being overwritten if the customer has purchased item twice
 						}
 					}
 				}
 			}
 		}
 	}
+
+	/**
+	 * @since 2.7.7
+	 *
+	 * Filter has purchased result
+	 */
+	$return = apply_filters( 'edd_has_user_purchased', $return, $user_id, $downloads, $variable_price_id );
 
 	return $return;
 }
@@ -382,6 +404,42 @@ function edd_validate_username( $username ) {
 }
 
 /**
+ * Attach the customer to an existing user account when completing guest purchase
+ *
+ * This only runs when a user account already exists and a guest purchase is made
+ * with the account's email address
+ *
+ * After attaching the customer to the user ID, the account is set to pending
+ *
+ * @since  2.8
+ * @param  bool   $success     True if payment was added successfully, false otherwise
+ * @param  int    $payment_id  The ID of the EDD_Payment that was added
+ * @param  int    $customer_id The ID of the EDD_Customer object
+ * @param  object $customer    The EDD_Customer object
+ * @return void
+ */
+function edd_connect_guest_customer_to_existing_user( $success, $payment_id, $customer_id, $customer ) {
+
+	if( ! empty( $customer->user_id ) ) {
+		return;
+	}
+
+	$user = get_user_by( 'email', $customer->email );
+
+	if( ! $user ) {
+		return;
+	}
+
+	$customer->update( array( 'user_id' => $user->ID ) );
+
+	// Set a flag to force the account to be verified before purchase history can be accessed
+	edd_set_user_to_pending( $user->ID  );
+	edd_send_user_verification_email( $user->ID  );
+
+}
+add_action( 'edd_customer_post_attach_payment', 'edd_connect_guest_customer_to_existing_user', 10, 4 );
+
+/**
  * Attach the newly created user_id to a customer, if one exists
  *
  * @since  2.4.6
@@ -415,7 +473,7 @@ function edd_add_past_purchases_to_new_user( $user_id ) {
 
 	$email    = get_the_author_meta( 'user_email', $user_id );
 
-	$payments = edd_get_payments( array( 's' => $email ) );
+	$payments = edd_get_payments( array( 's' => $email, 'output' => 'payments' ) );
 
 	if( $payments ) {
 
@@ -429,14 +487,8 @@ function edd_add_past_purchases_to_new_user( $user_id ) {
 				continue; // This payment already associated with an account
 			}
 
-			$meta                    = edd_get_payment_meta( $payment->ID );
-			$meta['user_info']       = maybe_unserialize( $meta['user_info'] );
-			$meta['user_info']['id'] = $user_id;
-			$meta['user_info']       = $meta['user_info'];
-
-			// Store the updated user ID in the payment meta
-			edd_update_payment_meta( $payment->ID, '_edd_payment_meta', $meta );
-			edd_update_payment_meta( $payment->ID, '_edd_payment_user_id', $user_id );
+			$payment->user_id = $user_id;
+			$payment->save();
 		}
 	}
 
@@ -470,23 +522,18 @@ function edd_get_customer_address( $user_id = 0 ) {
 
 	$address = get_user_meta( $user_id, '_edd_user_address', true );
 
-	if( ! isset( $address['line1'] ) )
-		$address['line1'] = '';
+	if ( ! $address || ! is_array( $address ) || empty( $address ) ) {
+		$address = array();
+	}
 
-	if( ! isset( $address['line2'] ) )
-		$address['line2'] = '';
-
-	if( ! isset( $address['city'] ) )
-		$address['city'] = '';
-
-	if( ! isset( $address['zip'] ) )
-		$address['zip'] = '';
-
-	if( ! isset( $address['country'] ) )
-		$address['country'] = '';
-
-	if( ! isset( $address['state'] ) )
-		$address['state'] = '';
+	$address = wp_parse_args( $address, array(
+		'line1'   => '',
+		'line2'   => '',
+		'city'    => '',
+		'zip'     => '',
+		'country' => '',
+		'state'   => '',
+	) );
 
 	return $address;
 }
@@ -823,7 +870,12 @@ function edd_validate_user_verification_token( $url = '' ) {
 
 			do_action( 'edd_user_verification_token_expired' );
 
-			wp_die( apply_filters( 'edd_verification_link_expired_text', __( 'Sorry but your account verification link has expired. <a href="#">Click here</a> to request a new verification URL.', 'easy-digital-downloads' ) ), __( 'Error', 'easy-digital-downloads' ), array( 'response' => 403 ) );
+			$link_text = sprintf(
+				__( 'Sorry but your account verification link has expired. <a href="%s">Click here</a> to request a new verification URL.', 'easy-digital-downloads' ),
+				edd_get_user_verification_request_url()
+			);
+
+			wp_die( apply_filters( 'edd_verification_link_expired_text', $link_text ), __( 'Error', 'easy-digital-downloads' ), array( 'response' => 403 ) );
 
 		}
 

@@ -160,6 +160,11 @@ class EDD_Tools_Recount_Store_Earnings extends EDD_Batch_Export {
 			$this->done = false;
 			return true;
 		} else {
+			delete_transient( 'edd_stats_earnings' );
+			delete_transient( 'edd_stats_sales' );
+			delete_transient( 'edd_estimated_monthly_stats' . true );
+			delete_transient( 'edd_estimated_monthly_stats' . false );
+
 			$this->delete_data( 'edd_recount_earnings_total' );
 			$this->delete_data( 'edd_temp_recount_earnings' );
 			$this->done    = true;
@@ -171,7 +176,7 @@ class EDD_Tools_Recount_Store_Earnings extends EDD_Batch_Export {
 	public function headers() {
 		ignore_user_abort( true );
 
-		if ( ! edd_is_func_disabled( 'set_time_limit' ) && ! ini_get( 'safe_mode' ) ) {
+		if ( ! edd_is_func_disabled( 'set_time_limit' ) ) {
 			set_time_limit( 0 );
 		}
 	}
@@ -202,7 +207,16 @@ class EDD_Tools_Recount_Store_Earnings extends EDD_Batch_Export {
 		global $wpdb;
 		$value = $wpdb->get_var( $wpdb->prepare( "SELECT option_value FROM $wpdb->options WHERE option_name = '%s'", $key ) );
 
-		return empty( $value ) ? false : maybe_unserialize( $value );
+		if ( empty( $value ) ) {
+			return false;
+		}
+
+		$maybe_json = json_decode( $value );
+		if ( ! is_null( $maybe_json ) ) {
+			$value = json_decode( $value, true );
+		}
+
+		return $value;
 	}
 
 	/**
@@ -216,7 +230,7 @@ class EDD_Tools_Recount_Store_Earnings extends EDD_Batch_Export {
 	private function store_data( $key, $value ) {
 		global $wpdb;
 
-		$value = maybe_serialize( $value );
+		$value = is_array( $value ) ? wp_json_encode( $value ) : esc_attr( $value );
 
 		$data = array(
 			'option_name'  => $key,

@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Easy Digital Downloads - Custom prices
-Plugin URL: http://easydigitaldownloads.com/extension/custom-prices/
+Plugin URL: http://easydigitaldownloads.com/downloads/custom-prices/
 Description: Allow customers to enter a custom price for a product, based on a minimum price set in the admin.
-Version: 1.5.1
-Author: Elliott Stocks
-Author URI: http://elliottstocks.co.uk/
+Version: 1.5.4
+Author: Easy Digital Downloads
+Author URI: https://easydigitaldownloads.com
 EDD Version Required: 1.9
 */
 
@@ -14,27 +14,27 @@ EDD Version Required: 1.9
  * ------------------------------------------------------------------------*/
 
 // Plugin version
-if( !defined( 'EDD_CUSTOM_PRICES' ) ) {
-	define( 'EDD_CUSTOM_PRICES', '1.5.1' );
+if( ! defined( 'EDD_CUSTOM_PRICES' ) ) {
+	define( 'EDD_CUSTOM_PRICES', '1.5.4' );
 }
 
 // Plugin Folder URL
-if( !defined( 'EDD_CUSTOM_PRICES_URL' ) ) {
+if( ! defined( 'EDD_CUSTOM_PRICES_URL' ) ) {
 	define( 'EDD_CUSTOM_PRICES_URL', plugin_dir_url( __FILE__ ) );
 }
 
 // Plugin Folder Path
-if( !defined( 'EDD_CUSTOM_PRICES_DIR' ) ) {
+if( ! defined( 'EDD_CUSTOM_PRICES_DIR' ) ) {
 	define( 'EDD_CUSTOM_PRICES_DIR', plugin_dir_path( __FILE__ ) );
 }
 
 // Plugin Root File
-if( !defined( 'EDD_CUSTOM_PRICES_FILE' ) ) {
+if( ! defined( 'EDD_CUSTOM_PRICES_FILE' ) ) {
 	define( 'EDD_CUSTOM_PRICES_FILE', __FILE__ );
 }
 
 // Plugin name
-if( !defined( 'EDD_CUSTOM_PRICES_PLUGIN_NAME' ) ) {
+if( ! defined( 'EDD_CUSTOM_PRICES_PLUGIN_NAME' ) ) {
 	define( 'EDD_CUSTOM_PRICES_PLUGIN_NAME', 'Custom Prices' );
 }
 
@@ -42,8 +42,8 @@ if( !defined( 'EDD_CUSTOM_PRICES_PLUGIN_NAME' ) ) {
 * Plugin updates/license key
 */
 
-if( class_exists( 'EDD_License' ) ) {
-	$license = new EDD_License( __FILE__, EDD_CUSTOM_PRICES_PLUGIN_NAME, EDD_CUSTOM_PRICES, 'Elliott Stocks' );
+if( class_exists( 'EDD_License' ) && is_admin() ) {
+	$license = new EDD_License( __FILE__, EDD_CUSTOM_PRICES_PLUGIN_NAME, EDD_CUSTOM_PRICES, 'EDD Team' );
 }
 
 /*
@@ -252,11 +252,15 @@ function edd_cp_purchase_link_top( $download_id ) {
 		$custom_price = edd_format_amount( $default_price );
 	}
 
-	if( edd_cp_has_custom_pricing($download_id) ) { ?>
-        <p class="edd-cp-container" <?php echo edd_has_variable_prices( $download_id ) ? 'style="display: none;"' : ''; ?>>
+	if ( edd_cp_has_custom_pricing( $download_id ) && ! edd_single_price_option_mode( $download_id ) ) {
+		$wrapper_display = '';
+		$download = new EDD_Download( $download_id );
+		if ( edd_item_in_cart( $download_id, array() ) && ( ! $download->has_variable_prices() || ! $download->is_single_price_mode() ) ) {
+			$wrapper_display = 'style="display:none;"';
+		} ?>
+        <p class="edd-cp-container" <?php echo $wrapper_display; ?>>
 		<?php
-
-      	__( 'Enter a price you\'d like to pay.', 'edd_cp' );
+      	//echo __( 'Name your price', 'edd_cp' );
 
         if ( ! isset( $edd_options['currency_position'] ) || $edd_options['currency_position'] == 'before' ) : ?>
             <?php echo edd_currency_filter( '' ); ?> <input type="text" name="edd_cp_price" class="edd_cp_price" value="<?php echo esc_attr( $custom_price ); ?>" size="30" data-min="<?php echo $min_price; ?>" style="width: 40px;" data-default-text="<?php echo esc_attr( $button_text ); ?>" />
@@ -274,13 +278,44 @@ function edd_cp_purchase_link_top( $download_id ) {
 add_filter( 'edd_purchase_link_top', 'edd_cp_purchase_link_top' );
 
 /*
+* Add additional list item if variable pricing is enabled
+*/
+
+function edd_cp_after_price_options_list( $key, $price, $download_id ) {
+	if( ! edd_cp_has_custom_pricing( $download_id ) ) {
+		return;
+	}
+
+	if ( ! edd_single_price_option_mode( $download_id ) ) {
+		return;
+	}
+
+	global $edd_options;
+	$default_price_option = edd_get_default_variable_price( $download_id );
+	$display = 'none';
+	if ( $key === $default_price_option ) {
+		$display = 'block';
+	} ?>
+
+	<div class="edd-cp-price-option-wrapper" style="display: <?php echo esc_attr( $display ); ?>;">
+		<?php
+		echo __( 'Name your price', 'edd_cp' );
+		if ( ! isset( $edd_options['currency_position'] ) || $edd_options['currency_position'] == 'before' ) : ?>
+			<?php echo edd_currency_filter( '' ); ?> <input type="text" name="edd_cp_price[<?php echo esc_attr( $key ); ?>]" class="edd_cp_price" value="<?php echo esc_attr( $price['amount'] ); ?>" size="30" data-min="" />
+		<?php else : ?>
+			<input type="text" name="edd_cp_price[<?php echo esc_attr( $key ); ?>]" class="edd_cp_price" value="<?php echo esc_attr( $price['amount'] ); ?>" size="30" data-min="" data-default-text="<?php echo esc_attr( $button_text ); ?>" /><?php echo edd_currency_filter( '' );
+		endif; ?>
+	</div>
+<?php }
+add_action( 'edd_after_price_option', 'edd_cp_after_price_options_list', 10, 3 );
+
+/*
 * Update price before adding item to card
 */
 
 function edd_cp_add_to_cart_item( $cart_item ) {
 	remove_filter( 'edd_add_to_cart_item', 'edd_cp_add_to_cart_item' );
 	remove_filter( 'edd_ajax_pre_cart_item_template', 'edd_cp_add_to_cart_item' );
-
 	if( !empty( $_POST['post_data'] ) || isset( $_POST['edd_cp_price'] ) ) {
 		if( !empty( $_POST['post_data'] ) ) {
 			$post_data = array();
@@ -289,8 +324,22 @@ function edd_cp_add_to_cart_item( $cart_item ) {
 		} else {
 			$custom_price = $_POST['edd_cp_price'];
 		}
-		if( !is_null( $custom_price ) && ( ( edd_has_variable_prices( $cart_item['id'] ) && $cart_item['options']['price_id'] == -1 ) || !edd_has_variable_prices( $cart_item['id'] ) ) ) {
-			$cart_item['options']['custom_price'] = edd_sanitize_amount( $custom_price );
+
+		// Multi-option purchase mode.
+		if ( ! empty( $_POST['price_ids'] ) && is_array( $custom_price ) && edd_single_price_option_mode( $cart_item['id'] ) ) {
+			foreach ( $_POST['price_ids'] as $price_id ) {
+				$original_price = edd_get_price_option_amount( $cart_item['id'], $price_id );
+
+				// It's only a custom price if the price doesn't match the original.
+				if ( isset( $custom_price[ $price_id ] ) && $custom_price[ $price_id ] !== $original_price ) {
+					$cart_item['options']['custom_price'][ $price_id ] = $custom_price[ $price_id ];
+				}
+			}
+
+		} else {
+			if ( ( ! is_null( $custom_price ) && "" !== $custom_price ) && ( ( edd_has_variable_prices( $cart_item['id'] ) ) || !edd_has_variable_prices( $cart_item['id'] ) ) ) {
+				$cart_item['options']['custom_price'] = edd_sanitize_amount( $custom_price );
+			}
 		}
 	}
 
@@ -348,10 +397,26 @@ function edd_cp_cart_item_price( $price, $item_id, $options = array() ) {
 		} else {
 			$min_price = get_post_meta( $item_id, 'edd_cp_min', true );
 			$custom_price = $options['custom_price'];
-			if( $min_price != 0 && ( $custom_price >= $min_price ) ) {
-				$price = $options['custom_price'];
-			} else if( $min_price == 0 && is_numeric( $options['custom_price'] ) ) {
-				$price = $options['custom_price'];
+
+
+			if ( edd_has_variable_prices( $item_id ) && edd_single_price_option_mode( $item_id ) ) {
+				$price_id = isset( $options['price_id'] ) ? $options['price_id'] : false;
+
+				if ( $price_id && isset( $custom_price[ $price_id ] ) ) {
+					$variable_price = $custom_price[ $price_id ];
+
+					if ( ( $min_price != 0 && ( $variable_price >= $min_price ) ) ||
+						( $min_price == 0 && is_numeric( $variable_price ) ) ) {
+							$price = $variable_price;
+					}
+				}
+			} else {
+
+				if( $min_price != 0 && ( $custom_price >= $min_price ) ) {
+					$price = $options['custom_price'];
+				} else if( $min_price == 0 && is_numeric( $options['custom_price'] ) ) {
+					$price = $options['custom_price'];
+				}
 			}
 		}
 	}
@@ -367,7 +432,7 @@ function edd_cp_get_price_name( $return, $item_id, $options ) {
 	if( isset( $options['is_cp_bonus'] ) ) {
 		return __( ' *bonus item*', 'edd_cp' );
 	} else if( edd_cp_has_custom_pricing( $item_id ) && isset( $options['custom_price'] ) ) {
-		if( edd_has_variable_prices( $item_id ) ) {
+		if ( edd_has_variable_prices( $item_id ) ) {
 			return __( 'custom price' , 'edd_cp' );
 		} else {
 			return __( ' - custom price' , 'edd_cp' );
@@ -380,44 +445,35 @@ add_filter( 'edd_get_price_name', 'edd_cp_get_price_name', 10, 3 );
 /*
 * Filter cart item price name (similar to above)
 */
-
-function edd_cp_get_cart_item_price_name($name, $item_id, $price_id, $item) {
+function edd_cp_get_cart_item_price_name( $name, $item_id, $price_id, $item ) {
 	if( isset( $item['options']['is_cp_bonus'] ) ) {
 		return __( ' *bonus item*', 'edd_cp' );
 	} else if( edd_cp_has_custom_pricing( $item_id ) && isset( $item['options']['custom_price'] ) ) {
-		return __( 'custom price', 'edd_cp' );
+
+		if ( edd_single_price_option_mode( $item_id ) && isset( $item['options']['custom_price'][ $price_id ] ) ) {
+			return $name . __( ' (custom price)', 'edd_cp' );
+		} elseif ( ! edd_single_price_option_mode( $item_id ) ) {
+			return $name . __( ' (custom price)', 'edd_cp' );
+		}
+
 	}
 	return $name;
 }
 add_filter( 'edd_get_cart_item_price_name', 'edd_cp_get_cart_item_price_name', 10, 4 );
 
 /*
-* Add additional list item if variable pricing is enabled
-*/
-
-function edd_cp_after_price_options_list( $download_id, $prices ) {
-	if( !edd_cp_has_custom_pricing( $download_id ) )
-		return;
-
-	$key = count( $prices ) +1;
-	$type = edd_single_price_option_mode( $download_id ) ? 'checkbox' : 'radio';
-	$default_price = get_post_meta( $download_id, 'edd_cp_default_price', true ); ?>
-	<li>
-		<label for="edd_cp_radio<?php echo esc_attr( $download_id ); ?>">
-			<input type="<?php echo esc_attr( $type ); ?>" name="edd_options[price_id][]" id="edd_cp_radio<?php echo esc_attr( $download_id ); ?>" class="edd_cp_radio <?php echo esc_attr( 'edd_price_option_' . $download_id ); ?>" value="-1" <?php echo checked( 1, ! empty( $default_price ), false ); ?> />
-			<span itemprop="description" class="edd_price_option_name"><?php echo __( 'Name your price', 'edd_cp' ); ?></span>
-		</label>
-	</li>
-<?php }
-add_filter( 'edd_after_price_options_list', 'edd_cp_after_price_options_list', 10, 2 );
-
-/*
 * Filter price option name
 */
-
-function edd_cp_get_price_option_name( $price_name, $download_id, $payment_id = 0 ) {
+function edd_cp_get_price_option_name( $price_name, $download_id, $payment_id = 0, $price_id ) {
 	if( $payment_id ) {
 		$cart_items =  edd_get_payment_meta_cart_details( $payment_id );
+		$prices = edd_get_variable_prices( $download_id );
+
+		if ( $prices && is_array( $prices ) ) {
+			if ( isset( $prices[ $price_id ] ) ) {
+				return $price_name;
+			}
+		}
 
 		if( $cart_items ) {
 			foreach( $cart_items as $key => $item ) {
@@ -429,18 +485,23 @@ function edd_cp_get_price_option_name( $price_name, $download_id, $payment_id = 
 					} else if( isset( $price_options['is_cp_bonus'] ) ) {
 						$price_name = __( '*Bonus item*', 'edd_cp' );
 					}
+
+					// Fallback for buy now items with custom price.
+					if ( 'direct' == edd_get_download_button_behavior( $download_id ) && edd_cp_has_custom_pricing( $item_id ) ) {
+						$price_name = __( 'Custom price', 'edd_cp' );
+					}
 				}
 			}
 		}
 	}
+
 	return $price_name;
 }
-add_filter( 'edd_get_price_option_name', 'edd_cp_get_price_option_name', 10, 3 );
+add_filter( 'edd_get_price_option_name', 'edd_cp_get_price_option_name', 10, 4 );
 
 /*
 * Filter the purchase data before sending it to the direct gateway
 */
-
 function edd_cp_straight_to_gateway_purchase_data( $purchase_data ) {
 	$min_price = get_post_meta( $_POST['download_id'], 'edd_cp_min', true );
 
@@ -448,13 +509,18 @@ function edd_cp_straight_to_gateway_purchase_data( $purchase_data ) {
 		$custom_price = edd_sanitize_amount( $_POST['edd_cp_price'] );
 		foreach( $purchase_data['downloads'] as $d_key => $downloads ) {
 			foreach( $downloads['options'] as $o_key => $options ) {
-				$purchase_data['downloads'][$d_key]['options'][$o_key]['amount'] = $custom_price;
-				$purchase_data['cart_details'][0]['item_number']['options'][$o_key]['amount'] = $custom_price;
+				if ( is_array( $purchase_data['downloads'][$d_key]['options'][$o_key] ) ) {
+					$purchase_data['downloads'][$d_key]['options'][$o_key]['amount'] = $custom_price;
+				}
+
+				if ( is_array( $purchase_data['cart_details'][0]['item_number']['options'][$o_key] ) ) {
+					$purchase_data['cart_details'][0]['item_number']['options'][$o_key]['amount'] = $custom_price;
+				}
 			}
 		}
 		$purchase_data['cart_details'][0]['item_price'] = $custom_price;
 		$purchase_data['cart_details'][0]['subtotal'] = $custom_price;
-		$purchase_data['cart_details'][0]['name'] = $purchase_data['cart_details'][0]['name'].' - custom price';
+		$purchase_data['cart_details'][0]['name'] = $purchase_data['cart_details'][0]['name'] . ' - custom price';
 		$purchase_data['subtotal'] = $custom_price;
 		$purchase_data['price'] = $custom_price;
 	}
@@ -515,3 +581,15 @@ function edd_cp_is_free_download( $is_free, $download_id ) {
 	return $is_free;
 }
 add_filter( 'edd_is_free_download', 'edd_cp_is_free_download', 10, 2 );
+
+/*
+* Add custom price to variable prices array on gateway page.
+* This fixes an issue when the price_id doesn't exist. The actual custom price is set later on edd_straight_to_gateway_purchase_data().
+*/
+function edd_cp_get_variable_prices( $prices, $download_id ) {
+	if ( edd_cp_has_custom_pricing( $download_id ) && doing_action('edd_straight_to_gateway') ) {
+		$prices[-1] = array( 'index' => -1, 'option' => 'Custom Price', 'name' => 'Custom Price', 'amount' => 0 );
+	}
+	return $prices;
+}
+add_filter( 'edd_get_variable_prices', 'edd_cp_get_variable_prices', 10, 2 );

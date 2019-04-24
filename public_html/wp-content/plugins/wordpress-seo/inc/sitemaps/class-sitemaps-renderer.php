@@ -1,5 +1,7 @@
 <?php
 /**
+ * WPSEO plugin file.
+ *
  * @package WPSEO\XML_Sitemaps
  */
 
@@ -8,28 +10,47 @@
  */
 class WPSEO_Sitemaps_Renderer {
 
-	/** @var string $stylesheet XSL stylesheet for styling a sitemap for web browsers. */
+	/**
+	 * XSL stylesheet for styling a sitemap for web browsers.
+	 *
+	 * @var string
+	 */
 	protected $stylesheet = '';
 
-	/** @var string $charset Holds the get_bloginfo( 'charset' ) value to reuse for performance. */
+	/**
+	 * Holds the get_bloginfo( 'charset' ) value to reuse for performance.
+	 *
+	 * @var string
+	 */
 	protected $charset = 'UTF-8';
 
-	/** @var string $output_charset Holds charset of output, might be converted. */
+	/**
+	 * Holds charset of output, might be converted.
+	 *
+	 * @var string
+	 */
 	protected $output_charset = 'UTF-8';
 
-	/** @var bool $needs_conversion If data encoding needs to be converted for output. */
+	/**
+	 * If data encoding needs to be converted for output.
+	 *
+	 * @var bool
+	 */
 	protected $needs_conversion = false;
 
-	/** @var WPSEO_Sitemap_Timezone $timezone */
+	/**
+	 * Timezone.
+	 *
+	 * @var WPSEO_Sitemap_Timezone
+	 */
 	protected $timezone;
 
 	/**
 	 * Set up object properties.
 	 */
 	public function __construct() {
-
-		$stylesheet_url       = preg_replace( '/(^http[s]?:)/', '', esc_url( home_url( 'main-sitemap.xsl' ) ) );
-		$this->stylesheet     = '<?xml-stylesheet type="text/xsl" href="' . $stylesheet_url . '"?>';
+		$stylesheet_url       = preg_replace( '/(^http[s]?:)/', '', $this->get_xsl_url() );
+		$this->stylesheet     = '<?xml-stylesheet type="text/xsl" href="' . esc_url( $stylesheet_url ) . '"?>';
 		$this->charset        = get_bloginfo( 'charset' );
 		$this->output_charset = $this->charset;
 		$this->timezone       = new WPSEO_Sitemap_Timezone();
@@ -189,7 +210,7 @@ class WPSEO_Sitemaps_Renderer {
 
 		$url['loc'] = htmlspecialchars( $url['loc'] );
 
-		$output = "\t<sitemap>\n";
+		$output  = "\t<sitemap>\n";
 		$output .= "\t\t<loc>" . $url['loc'] . "</loc>\n";
 		$output .= empty( $date ) ? '' : "\t\t<lastmod>" . htmlspecialchars( $date ) . "</lastmod>\n";
 		$output .= "\t</sitemap>\n";
@@ -218,7 +239,7 @@ class WPSEO_Sitemaps_Renderer {
 
 		$url['loc'] = htmlspecialchars( $url['loc'] );
 
-		$output = "\t<url>\n";
+		$output  = "\t<url>\n";
 		$output .= "\t\t<loc>" . $this->encode_url_rfc3986( $url['loc'] ) . "</loc>\n";
 		$output .= empty( $date ) ? '' : "\t\t<lastmod>" . htmlspecialchars( $date ) . "</lastmod>\n";
 
@@ -243,7 +264,7 @@ class WPSEO_Sitemaps_Renderer {
 					$title = mb_convert_encoding( $title, $this->output_charset, $this->charset );
 				}
 
-				$title = _wp_specialchars( html_entity_decode( $title, ENT_QUOTES, $this->output_charset ) );
+				$title   = _wp_specialchars( html_entity_decode( $title, ENT_QUOTES, $this->output_charset ) );
 				$output .= "\t\t\t<image:title><![CDATA[{$title}]]></image:title>\n";
 			}
 
@@ -255,7 +276,7 @@ class WPSEO_Sitemaps_Renderer {
 					$alt = mb_convert_encoding( $alt, $this->output_charset, $this->charset );
 				}
 
-				$alt = _wp_specialchars( html_entity_decode( $alt, ENT_QUOTES, $this->output_charset ) );
+				$alt     = _wp_specialchars( html_entity_decode( $alt, ENT_QUOTES, $this->output_charset ) );
 				$output .= "\t\t\t<image:caption><![CDATA[{$alt}]]></image:caption>\n";
 			}
 
@@ -288,8 +309,7 @@ class WPSEO_Sitemaps_Renderer {
 			return $url;
 		}
 
-		// @todo Replace with call to wp_parse_url() once minimum requirement has gone up to WP 4.7.
-		$path = parse_url( $url, PHP_URL_PATH );
+		$path = wp_parse_url( $url, PHP_URL_PATH );
 
 		if ( ! empty( $path ) && '/' !== $path ) {
 			$encoded_path = explode( '/', $path );
@@ -304,8 +324,7 @@ class WPSEO_Sitemaps_Renderer {
 			$url = str_replace( $path, $encoded_path, $url );
 		}
 
-		// @todo Replace with call to wp_parse_url() once minimum requirement has gone up to WP 4.7.
-		$query = parse_url( $url, PHP_URL_QUERY );
+		$query = wp_parse_url( $url, PHP_URL_QUERY );
 
 		if ( ! empty( $query ) ) {
 
@@ -324,5 +343,30 @@ class WPSEO_Sitemaps_Renderer {
 		}
 
 		return $url;
+	}
+
+	/**
+	 * Retrieves the XSL URL that should be used in the current environment
+	 *
+	 * When home_url and site_url are not the same, the home_url should be used.
+	 * This is because the XSL needs to be served from the same domain, protocol and port
+	 * as the XML file that is loading it.
+	 *
+	 * @return string The XSL URL that needs to be used.
+	 */
+	protected function get_xsl_url() {
+		if ( home_url() !== site_url() ) {
+			return home_url( 'main-sitemap.xsl' );
+		}
+
+		/*
+		 * Fallback to circumvent a cross-domain security problem when the XLS file is
+		 * loaded from a different (sub)domain.
+		 */
+		if ( strpos( plugins_url(), home_url() ) !== 0 ) {
+			return home_url( 'main-sitemap.xsl' );
+		}
+
+		return plugin_dir_url( WPSEO_FILE ) . 'css/main-sitemap.xsl';
 	}
 }

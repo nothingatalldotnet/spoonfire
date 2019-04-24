@@ -1,5 +1,7 @@
 <?php
 /**
+ * WPSEO plugin file.
+ *
  * @package WPSEO\Admin\Capabilities
  */
 
@@ -7,6 +9,7 @@
  * VIP implementation of the Capability Manager.
  */
 final class WPSEO_Capability_Manager_VIP extends WPSEO_Abstract_Capability_Manager {
+
 	/**
 	 * Adds the registered capabilities to the system.
 	 *
@@ -19,7 +22,7 @@ final class WPSEO_Capability_Manager_VIP extends WPSEO_Abstract_Capability_Manag
 		}
 
 		foreach ( $role_capabilities as $role => $capabilities ) {
-			wpcom_vip_add_role_caps( $role, array( $capabilities ) );
+			wpcom_vip_add_role_caps( $role, $capabilities );
 		}
 	}
 
@@ -40,7 +43,7 @@ final class WPSEO_Capability_Manager_VIP extends WPSEO_Abstract_Capability_Manag
 		}
 
 		foreach ( $role_capabilities as $role => $capabilities ) {
-			wpcom_vip_remove_role_caps( $role, array( $capabilities ) );
+			wpcom_vip_remove_role_caps( $role, $capabilities );
 		}
 	}
 

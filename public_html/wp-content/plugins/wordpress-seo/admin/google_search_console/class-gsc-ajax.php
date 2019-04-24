@@ -1,6 +1,8 @@
 <?php
 /**
- * @package WPSEO\Admin|Google_Search_Console
+ * WPSEO plugin file.
+ *
+ * @package WPSEO\Admin\Google_Search_Console
  */
 
 /**
@@ -12,7 +14,7 @@ class WPSEO_GSC_Ajax {
 	 * Setting the AJAX hooks for GSC
 	 */
 	public function __construct() {
-		add_action( 'wp_ajax_wpseo_mark_fixed_crawl_issue',  array( $this, 'ajax_mark_as_fixed' ) );
+		add_action( 'wp_ajax_wpseo_mark_fixed_crawl_issue', array( $this, 'ajax_mark_as_fixed' ) );
 		add_action( 'wp_ajax_wpseo_dismiss_gsc', array( $this, 'dismiss_notice' ) );
 		add_action( 'wp_ajax_wpseo_save_auth_code', array( $this, 'save_auth_code' ) );
 		add_action( 'wp_ajax_wpseo_clear_auth_code', array( $this, 'clear_auth_code' ) );
@@ -103,6 +105,6 @@ class WPSEO_GSC_Ajax {
 	private function get_profiles() {
 		$component = new WPSEO_Config_Component_Connect_Google_Search_Console();
 
-		wp_die( wp_json_encode( $component->get_data() ) );
+		wp_die( WPSEO_Utils::format_json_encode( $component->get_data() ) );
 	}
 }

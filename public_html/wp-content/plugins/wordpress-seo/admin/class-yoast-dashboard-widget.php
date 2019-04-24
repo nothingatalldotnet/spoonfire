@@ -1,5 +1,7 @@
 <?php
 /**
+ * WPSEO plugin file.
+ *
  * @package WPSEO\Admin
  */
 
@@ -8,6 +10,9 @@
  */
 class Yoast_Dashboard_Widget {
 
+	/**
+	 * @var string
+	 */
 	const CACHE_TRANSIENT_KEY = 'wpseo-dashboard-totals';
 
 	/**
@@ -28,11 +33,19 @@ class Yoast_Dashboard_Widget {
 			$statistics = new WPSEO_Statistics();
 		}
 
-		$this->statistics = $statistics;
+		$this->statistics    = $statistics;
 		$this->asset_manager = new WPSEO_Admin_Asset_Manager();
 
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_dashboard_assets' ) );
+		add_action( 'admin_init', array( $this, 'queue_dashboard_widget' ) );
+	}
 
+	/**
+	 * Adds the dashboard widget if it should be shown.
+	 *
+	 * @return void
+	 */
+	public function queue_dashboard_widget() {
 		if ( $this->show_widget() ) {
 			add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widget' ) );
 		}
@@ -71,19 +84,6 @@ class Yoast_Dashboard_Widget {
 	}
 
 	/**
-	 * Enqueues stylesheet for the dashboard if the current page is the dashboard.
-	 */
-	public function enqueue_dashboard_stylesheets() {
-		_deprecated_function( __METHOD__, 'WPSEO 5.5', 'This method is deprecated, please use the <code>enqueue_dashboard_assets</code> method.' );
-
-		if ( ! $this->is_dashboard_screen() ) {
-			return;
-		}
-
-		$this->asset_manager->enqueue_style( 'wp-dashboard' );
-	}
-
-	/**
 	 * Enqueues assets for the dashboard if the current page is the dashboard.
 	 */
 	public function enqueue_dashboard_assets() {
@@ -92,6 +92,8 @@ class Yoast_Dashboard_Widget {
 		}
 
 		wp_localize_script( WPSEO_Admin_Asset_Manager::PREFIX . 'dashboard-widget', 'wpseoDashboardWidgetL10n', $this->localize_dashboard_script() );
+		$yoast_components_l10n = new WPSEO_Admin_Asset_Yoast_Components_L10n();
+		$yoast_components_l10n->localize_script( WPSEO_Admin_Asset_Manager::PREFIX . 'dashboard-widget' );
 		$this->asset_manager->enqueue_script( 'dashboard-widget' );
 		$this->asset_manager->enqueue_style( 'wp-dashboard' );
 	}
@@ -103,13 +105,18 @@ class Yoast_Dashboard_Widget {
 	 */
 	public function localize_dashboard_script() {
 		return array(
-			'feed_header'      => __( 'Latest blogposts on Yoast.com', 'wordpress-seo' ),
+			'feed_header'      => sprintf(
+				/* translators: %1$s resolves to Yoast.com */
+				__( 'Latest blog posts on %1$s', 'wordpress-seo' ),
+				'Yoast.com'
+			),
 			'feed_footer'      => __( 'Read more like this on our SEO blog', 'wordpress-seo' ),
 			'ryte_header'      => sprintf(
 				/* translators: %1$s expands to Ryte. */
 				__( 'Indexability check by %1$s', 'wordpress-seo' ),
 				'Ryte'
 			),
+			'ryteEnabled'      => ( WPSEO_Options::get( 'onpage_indexability' ) === true ),
 			'ryte_fetch'       => __( 'Fetch the current status', 'wordpress-seo' ),
 			'ryte_analyze'     => __( 'Analyze entire site', 'wordpress-seo' ),
 			'ryte_fetch_url'   => esc_attr( add_query_arg( 'wpseo-redo-onpage', '1' ) ) . '#wpseo-dashboard-overview',

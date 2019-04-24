@@ -1,5 +1,7 @@
 <?php
 /**
+ * WPSEO plugin file.
+ *
  * @package WPSEO\Plugin_Compatibility
  */
 
@@ -26,14 +28,14 @@ class WPSEO_Plugin_Compatibility {
 	/**
 	 * WPSEO_Plugin_Compatibility constructor.
 	 *
-	 * @param string     $version The version to check against.
+	 * @param string     $version              The version to check against.
 	 * @param null|class $availability_checker The checker to use.
 	 */
 	public function __construct( $version, $availability_checker = null ) {
 		// We trim off the patch version, as this shouldn't break the comparison.
 		$this->current_wpseo_version = $this->get_major_minor_version( $version );
-		$this->availability_checker = $this->retrieve_availability_checker( $availability_checker );
-		$this->installed_plugins = $this->availability_checker->get_installed_plugins();
+		$this->availability_checker  = $this->retrieve_availability_checker( $availability_checker );
+		$this->installed_plugins     = $this->availability_checker->get_installed_plugins();
 	}
 
 	/**
@@ -45,7 +47,8 @@ class WPSEO_Plugin_Compatibility {
 	 */
 	private function retrieve_availability_checker( $checker ) {
 		if ( is_null( $checker ) || ! is_object( $checker ) ) {
-			return new WPSEO_Plugin_Availability();
+			$checker = new WPSEO_Plugin_Availability();
+			$checker->register();
 		}
 
 		return $checker;

@@ -1,16 +1,27 @@
 <?php
 /**
+ * WPSEO plugin file.
+ *
  * @package WPSEO\Admin
  */
 
 /**
- * Class Premium_Upsell_Admin_Block
+ * Class WPSEO_Premium_Upsell_Admin_Block
  */
-class Premium_Upsell_Admin_Block {
-	/** @var string Hook to display the block on. */
+class WPSEO_Premium_Upsell_Admin_Block {
+
+	/**
+	 * Hook to display the block on.
+	 *
+	 * @var string
+	 */
 	protected $hook;
 
-	/** @var string Identifier to use in the dismissal functionality. */
+	/**
+	 * Identifier to use in the dismissal functionality.
+	 *
+	 * @var string
+	 */
 	protected $identifier = 'premium_upsell_admin_block';
 
 	/**
@@ -42,7 +53,7 @@ class Premium_Upsell_Admin_Block {
 		$url = WPSEO_Shortlinker::get( 'https://yoa.st/17h' );
 
 		$arguments = array(
-			'<strong>' . esc_html__( 'Multiple keywords', 'wordpress-seo' ) . '</strong>: ' . esc_html__( 'Increase your SEO reach', 'wordpress-seo' ),
+			'<strong>' . esc_html__( 'Multiple keyphrases', 'wordpress-seo' ) . '</strong>: ' . esc_html__( 'Increase your SEO reach', 'wordpress-seo' ),
 			'<strong>' . esc_html__( 'No more dead links', 'wordpress-seo' ) . '</strong>: ' . esc_html__( 'Easy redirect manager', 'wordpress-seo' ),
 			'<strong>' . esc_html__( 'Superfast internal linking suggestions', 'wordpress-seo' ) . '</strong>',
 			'<strong>' . esc_html__( 'Social media preview', 'wordpress-seo' ) . '</strong>: ' . esc_html__( 'Facebook & Twitter', 'wordpress-seo' ),
@@ -55,18 +66,39 @@ class Premium_Upsell_Admin_Block {
 		$class = $this->get_html_class();
 
 		/* translators: %s expands to "Yoast SEO Premium". */
-		$dismiss_msg = sprintf( __( 'Dismiss %s upgrade motivation', 'wordpress-seo' ), 'Yoast SEO Premium' );
-		/* translators: %s expands to "Yoast SEO Premium". */
-		$upgrade_msg = sprintf( __( 'Find out why you should upgrade to %s &raquo;', 'wordpress-seo' ), 'Yoast SEO Premium' );
+		$dismiss_msg = sprintf( __( 'Dismiss %s upgrade notice', 'wordpress-seo' ), 'Yoast SEO Premium' );
 
-		echo '<div class="' . $class . '">';
-		echo '<a href="' . esc_url( add_query_arg( array( $this->get_query_variable_name() => 1 ) ) ) . '" style="" class="alignright ' . $class . '--close" aria-label="' . esc_attr( $dismiss_msg ) . '">X</a>';
+		/* translators: %s expands to Yoast SEO Premium */
+		$button_text  = esc_html( sprintf( __( 'Get %s', 'wordpress-seo' ), 'Yoast SEO Premium' ) );
+		$button_text .= '<span class="screen-reader-text">' . esc_html__( '(Opens in a new browser tab)', 'wordpress-seo' ) . '</span>' .
+			'<span aria-hidden="true" class="yoast-button-upsell__caret"></span>';
+
+		$upgrade_button = sprintf(
+			'<a id="wpseo-%1$s-popup-button" class="yoast-button-upsell" href="%2$s" target="_blank">%3$s</a>',
+			$this->identifier,
+			esc_url( $url ),
+			$button_text
+		);
+
+		echo '<div class="' . esc_attr( $class ) . '">';
+		printf(
+			'<a href="%1$s" style="" class="alignright button %2$s" aria-label="%3$s"><span class="dashicons dashicons-no-alt"></span></a>',
+			esc_url( add_query_arg( array( $this->get_query_variable_name() => 1 ) ) ),
+			esc_attr( $class . '--close' ),
+			esc_attr( $dismiss_msg )
+		);
 
 		echo '<div>';
-		echo '<h2 class="' . $class . '--header">' . __( 'Go premium!', 'wordpress-seo' ) . '</h2>';
-		echo '<ul class="' . $class . '--motivation">' . $arguments_html . '</ul>';
+		echo '<h2 class="' . esc_attr( $class . '--header' ) . '">' .
+			sprintf(
+				/* translators: %s expands to Yoast SEO Premium */
+				esc_html__( 'Upgrade to %s', 'wordpress-seo' ),
+				'Yoast SEO Premium'
+			) .
+		'</h2>';
+		echo '<ul class="' . esc_attr( $class . '--motivation' ) . '">' . $arguments_html . '</ul>';
 
-		echo '<p><a href="' . esc_url( $url ) . '" target="_blank">' . $upgrade_msg . '</a><br />';
+		echo '<p>' . $upgrade_button . '</p>';
 		echo '</div>';
 
 		echo '</div>';
@@ -82,7 +114,11 @@ class Premium_Upsell_Admin_Block {
 	protected function get_argument_html( $argument ) {
 		$class = $this->get_html_class();
 
-		return sprintf( '<li><div class="%s--argument">%s</div></li>', $class, $argument );
+		return sprintf(
+			'<li><div class="%1$s">%2$s</div></li>',
+			esc_attr( $class . '--argument' ),
+			$argument
+		);
 	}
 
 	/**

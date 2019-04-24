@@ -1,6 +1,8 @@
 <?php
 /**
- * @package WPSEO\Admin|Ajax
+ * WPSEO plugin file.
+ *
+ * @package WPSEO\Admin\Ajax
  */
 
 /**
@@ -34,6 +36,6 @@ class WPSEO_Shortcode_Filter {
 			);
 		}
 
-		wp_die( wp_json_encode( $parsed_shortcodes ) );
+		wp_die( WPSEO_Utils::format_json_encode( $parsed_shortcodes ) );
 	}
 }

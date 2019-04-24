@@ -1,5 +1,7 @@
 <?php
 /**
+ * WPSEO plugin file.
+ *
  * @package WPSEO\Admin
  */
 
@@ -24,12 +26,16 @@ class Yoast_Input_Select {
 	private $select_attributes = array();
 
 	/**
-	 * @var array Array with the options to parse.
+	 * Array with the options to parse.
+	 *
+	 * @var array
 	 */
 	private $select_options;
 
 	/**
-	 * @var string The current selected option.
+	 * The current selected option.
+	 *
+	 * @var string
 	 */
 	private $selected_option;
 
@@ -42,10 +48,10 @@ class Yoast_Input_Select {
 	 * @param string $selected_option The current selected option.
 	 */
 	public function __construct( $select_id, $select_name, array $select_options, $selected_option ) {
-		$this->select_id         = $select_id;
-		$this->select_name       = $select_name;
-		$this->select_options    = $select_options;
-		$this->selected_option   = $selected_option;
+		$this->select_id       = $select_id;
+		$this->select_name     = $select_name;
+		$this->select_options  = $select_options;
+		$this->selected_option = $selected_option;
 	}
 
 	/**

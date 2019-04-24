@@ -1,7 +1,9 @@
 <?php
 /**
- * @package    WPSEO\Admin\Notifications
- * @since      1.5.3
+ * WPSEO plugin file.
+ *
+ * @package WPSEO\Admin\Notifications
+ * @since   1.5.3
  */
 
 /**
@@ -9,14 +11,44 @@
  */
 class Yoast_Notification {
 
+	/**
+	 * Type of capability check.
+	 *
+	 * @var string
+	 */
 	const MATCH_ALL = 'all';
+
+	/**
+	 * Type of capability check.
+	 *
+	 * @var string
+	 */
 	const MATCH_ANY = 'any';
 
+	/**
+	 * Notification type.
+	 *
+	 * @var string
+	 */
 	const ERROR = 'error';
+
+	/**
+	 * Notification type.
+	 *
+	 * @var string
+	 */
 	const WARNING = 'warning';
+
+	/**
+	 * Notification type.
+	 *
+	 * @var string
+	 */
 	const UPDATED = 'updated';
 
 	/**
+	 * Options of this Notification.
+	 *
 	 * Contains optional arguments:
 	 *
 	 * -             type: The notification type, i.e. 'updated' or 'error'
@@ -28,11 +60,15 @@ class Yoast_Notification {
 	 * - capability_check: How to check capability pass: all or any.
 	 * -  wpseo_page_only: Only display on wpseo page or on every page.
 	 *
-	 * @var array Options of this Notification.
+	 * @var array
 	 */
 	private $options = array();
 
-	/** @var array Contains default values for the optional arguments */
+	/**
+	 * Contains default values for the optional arguments.
+	 *
+	 * @var array
+	 */
 	private $defaults = array(
 		'type'             => self::UPDATED,
 		'id'               => '',
@@ -42,7 +78,15 @@ class Yoast_Notification {
 		'dismissal_key'    => null,
 		'capabilities'     => array(),
 		'capability_check' => self::MATCH_ALL,
+		'yoast_branding'   => false,
 	);
+
+	/**
+	 * The message for the notification.
+	 *
+	 * @var string
+	 */
+	private $message;
 
 	/**
 	 * Notification class constructor.
@@ -262,8 +306,38 @@ class Yoast_Notification {
 		// Combined attribute key and value into a string.
 		array_walk( $attributes, array( $this, 'parse_attributes' ) );
 
+		$message = null;
+		if ( $this->options['yoast_branding'] ) {
+			$message = $this->wrap_yoast_seo_icon( $this->message );
+		}
+
+		if ( $message === null ) {
+			$message = wpautop( $this->message );
+		}
+
 		// Build the output DIV.
-		return '<div ' . implode( ' ', $attributes ) . '>' . wpautop( $this->message ) . '</div>' . PHP_EOL;
+		return '<div ' . implode( ' ', $attributes ) . '>' . $message . '</div>' . PHP_EOL;
+	}
+
+	/**
+	 * Wraps the message with a Yoast SEO icon.
+	 *
+	 * @param string $message The message to wrap.
+	 *
+	 * @return string The wrapped message.
+	 */
+	private function wrap_yoast_seo_icon( $message ) {
+		$out  = sprintf(
+			'<img src="%1$s" height="%2$d" width="%3$d" class="yoast-seo-icon" />',
+			esc_url( plugin_dir_url( WPSEO_FILE ) . 'images/Yoast_SEO_Icon.svg' ),
+			60,
+			60
+		);
+		$out .= '<div class="yoast-seo-icon-wrap">';
+		$out .= $message;
+		$out .= '</div>';
+
+		return $out;
 	}
 
 	/**
@@ -276,7 +350,7 @@ class Yoast_Notification {
 			return '';
 		}
 
-		return wp_json_encode( $this->options['data_json'] );
+		return WPSEO_Utils::format_json_encode( $this->options['data_json'] );
 	}
 
 	/**

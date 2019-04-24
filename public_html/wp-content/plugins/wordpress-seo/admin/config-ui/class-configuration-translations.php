@@ -1,5 +1,7 @@
 <?php
 /**
+ * WPSEO plugin file.
+ *
  * @package WPSEO\Admin\ConfigurationUI
  */
 
@@ -8,10 +10,18 @@
  */
 class WPSEO_Configuration_Translations {
 
-	/** @var array Registered steps */
+	/**
+	 * Registered steps.
+	 *
+	 * @var array
+	 */
 	protected $translations = array();
 
-	/** @var string The locale */
+	/**
+	 * The locale.
+	 *
+	 * @var string
+	 */
 	protected $locale;
 
 	/**
@@ -41,8 +51,11 @@ class WPSEO_Configuration_Translations {
 	protected function get_translations_from_file() {
 
 		$file = plugin_dir_path( WPSEO_FILE ) . 'languages/yoast-components-' . $this->locale . '.json';
-		if ( file_exists( $file ) && $file = file_get_contents( $file ) ) {
-			return json_decode( $file, true );
+		if ( file_exists( $file ) ) {
+			$file = file_get_contents( $file );
+			if ( is_string( $file ) && $file !== '' ) {
+				return json_decode( $file, true );
+			}
 		}
 
 		return array();
